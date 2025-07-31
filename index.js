@@ -11,10 +11,8 @@ const __dirname = path.dirname(__filename)
 
 const ytDlpPath = path.join(__dirname, 'bin', 'yt-dlp')
 
-// Diretório de destino dos downloads
 const downloadsDir = path.join(__dirname, 'downloads')
 if (!existsSync(downloadsDir)) {
-  // Cria a pasta downloads se não existir
   mkdirSync(downloadsDir)
 }
 
@@ -124,14 +122,12 @@ function runYtDlpWithProgress(args) {
           return true
         }
 
-        // Se é uma mensagem de download mas não conseguimos extrair progresso
         if (cleanLine.includes('Destination:')) {
           const filename = cleanLine.split('/').pop()
           console.log(chalk.blue(`\n📥 Baixando: ${filename}`))
           return true
         }
 
-        // Outras mensagens de download que não queremos mostrar como info
         if (cleanLine.includes('100%') || cleanLine.includes('ETA NA')) {
           return true
         }
@@ -145,7 +141,6 @@ function runYtDlpWithProgress(args) {
     function parseConversionLine(line) {
       const cleanLine = line.trim()
 
-      // Detectar início da conversão
       if (cleanLine.includes('[VideoConvertor]') && cleanLine.includes('Converting video')) {
         if (downloadStarted) {
           downloadBar.stop()
@@ -158,7 +153,6 @@ function runYtDlpWithProgress(args) {
           status: 'Iniciando conversão...'
         })
 
-        // Simular progresso da conversão (já que ffmpeg não sempre reporta progresso)
         const conversionInterval = setInterval(() => {
           if (conversionProgress < 90) {
             conversionProgress += Math.random() * 15
@@ -168,7 +162,6 @@ function runYtDlpWithProgress(args) {
           }
         }, 500)
 
-        // Armazenar o interval para poder limpar depois
         process.conversionInterval = conversionInterval
         return true
       }
@@ -184,13 +177,11 @@ function runYtDlpWithProgress(args) {
       return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + sizes[i]
     }
 
-    // Processar stdout
     process.stdout.on('data', data => {
       const lines = data.toString().split(/\r?\n/)
       for (const line of lines) {
         if (line.trim()) {
           if (!parseProgressLine(line) && !parseConversionLine(line)) {
-            // Filtrar mensagens desnecessárias
             if (line.includes('[info]') && line.includes('Downloading') && line.includes('format(s)')) {
               const formatInfo = line.match(/Downloading \d+ format\(s\): ([\d+]+)/)
               if (formatInfo) {
@@ -202,7 +193,6 @@ function runYtDlpWithProgress(args) {
       }
     })
 
-    // Processar stderr  
     process.stderr.on('data', data => {
       const lines = data.toString().split(/\r?\n/)
       for (const line of lines) {
@@ -344,8 +334,6 @@ async function main() {
   console.log('\n📥 Iniciando download...')
   console.log(`📁 Destino: ${chalk.cyan(downloadsDir)}`)
   console.log('')
-
-  // A barra de progresso do download será iniciada automaticamente ao detectar progresso real
 
   try {
     await runYtDlpWithProgress(['-f', format, '-o', output, ...extraArgs, url])

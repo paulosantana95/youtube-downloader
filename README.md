@@ -14,7 +14,7 @@ Ferramenta de linha de comando para baixar vídeos ou áudios do YouTube com sel
 
 1. Clone este repositório:
    ```sh
-   git clone <url-do-repo>
+   git clone https://github.com/paulosantana95/youtube-downloader
    cd yt-downloader
    ```
 2. Instale as dependências:
